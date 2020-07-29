@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.team404.movie.mapper.MovieReplyMapper">
+	<insert id="replyRegist">
+		insert into MOVIEREPLY(rno,bno,reply,replyId,replyPw)
+		values(MOVIEREPLY_seq.nextval,#{bno},#{reply},#{replyId},#{replyPw})
+		
+		
+		<!-- private int FOUND_REPLY_NUMBER; private int FOUND_NUMBER; private 
+			String MEMBERS_ID ; private String FOUND_REPLY_CONTENT; private Timestamp 
+			FOUND_REPLY_REGDATE; -->
+
+		<!-- insert into FOUND_REPLY(FOUND_REPLY_NUMBER,FOUND_NUMBER,MEMBERS_ID,FOUND_REPLY_CONTENT) 
+			values(FOUND_REPLY_SEQUENCE.nextval,#{FOUND_NUMBER},#{MEMBERS_ID},#{FOUND_REPLY_CONTENT}) -->
+
+	</insert>
+	<select id="getList" resultType="MovieReplyVO">
+		<!-- select * from freereply where bno = #{bno} order by rno desc -->
+<![CDATA[		
+select * from(
+select rownum as rn,
+    rno,
+    bno,
+    reply,
+    replyId,
+    replyPw,
+ 	replyDate
+from(
+    select * from
+    freereply
+    where bno =#{bno}
+    order by rno desc) 
+) where rn >(#{cri.pageNum}-1)*#{cri.amount} 
+	and rn <=#{cri.pageNum}*#{cri.amount}
+]]> 
+
+</select>
+<select id="getTotal" resultType="int">
+ 		select count(*) as total from MOVIEREPLY where bno =#{bno}
+	</select>
+	
+	<select id="pwCheck" resultType="int">
+		select count(*) as result from MOVIEREPLY where rno = #{rno} and replyPw = #{replyPw}
+	</select>
+	<update id ="update" >
+		update MOVIEREPLY set reply =#{reply}, replyDate =sysdate
+		where rno = #{rno}
+	</update>
+	<delete id ="delete" >
+		delete from MOVIEREPLY where rno = #{rno}
+		
+	</delete>
+
+</mapper>

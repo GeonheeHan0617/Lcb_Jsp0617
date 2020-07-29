@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.team404.user.mapper.UserMapper">
+
+	<select id="idCheck" resultType="int">
+		select count(*) as total from
+		users where userId = #{userId}
+	</select>
+	<insert id="joinForm">
+		insert into
+		users(userId,userPw,userName,userPhone1,userPhone2,userEmail1,userEmail2,addrZipNum,addrBasic,addrDetail)
+		values(#{userId},#{userPw},#{userName},#{userPhone1},#{userPhone2},#{userEmail1},#{userEmail2},#{addrZipNum},#{addrBasic},#{addrDetail})
+	</insert>
+	<select id="loginForm" resultType="int">
+		select count(*) as total from
+		users where userId = #{userId} and userPw =#{userPw}
+
+	</select>
+
+	<!-- select 2번이나 join 한다. -->
+	<!-- 1:N관계 join 자리 할때 resultMap 태그를 이용할수 있습니다. -->
+	<resultMap type="UserVO" id="boardList" >
+		<result column="userid" property="userId" />
+		<result column="userpw" property="userPw" />
+		<result column="username" property="userName" />
+		<result column="userphone1" property="userPhone1" />
+		<result column="userphone2" property="userPhone2" />
+		<result column="useremail1" property="userEmail1" />
+		<result column="useremail2" property="userEmail2" />
+		<result column="addrzipnum" property="addrZipNum" />
+		<result column="addrbasic" property="addrBasic" />
+		<result column="addrdetail" property="addrDetail" />
+		<collection resultMap="List" property="userBoardList"></collection>
+	</resultMap>
+	
+	
+	<resultMap type="FreeBoardVO" id="List">
+		<result column="bno" property="bno"></result>
+		<result column="title" property="title"></result>
+		<result column="regdate" property="regdate"></result>
+	
+	</resultMap>
+	<select id="userInfo" resultMap="boardList"> <!-- result type이 1:1일때 임. -->
+		select
+		userid,
+		userpw,
+		username,
+		userphone1,
+		userphone2,
+		useremail1,
+		useremail2,
+		addrzipnum,
+		addrbasic,
+		addrdetail,
+		f.bno,
+		f.title,
+		f.regdate
+		from users u
+		left outer join freeboard f
+		on u.userid = f.writer
+		where userid = #{userId}
+
+
+
+	</select>
+
+</mapper>
